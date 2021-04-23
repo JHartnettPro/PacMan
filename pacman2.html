@@ -1,90 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pacman Demo</title>
+    <title>Awful Game</title>
     <style type="text/css">
         body {
             background-color: black;
+            margin-top: 200px;
+            margin-left: 700px;
         }
-
         div.row div {
             width: 20px;
             height: 20px;
+            margin-bottom: -4px;
             display: inline-block;
         }
-
         div.brick {
             background-color: blue;
+            width: 20px;
+            height: 20px;
         }
-
         div.coin {
-            background: url("coin3.gif");
+            background: orange;
             background-repeat: no-repeat;
             background-position: center;
         }
-
         div#pacman {
-            background: url("undertale4.gif");
+            background: yellow;
             background-repeat: no-repeat;
             background-position: center;
-            width: 76px;
-            height: 69px;
+            width: 20px;
+            height: 20px;
             position: absolute;
+            margin-top: 200px;
+            margin-left: 700px;
         }
-
         div.empty {
             background-color: black;
         }
+        div#win {
+            border: 1px solid white;
+            width: 30px;
+            height: 30px;
+            color: green;
+            padding: 7px;
+            text-align: center;
+            position: absolute;
+            top: 100px;
+            left: 850px;
+        }
+        div#score {
+            border: 1px solid white;
+            width: 30px;
+            height: 30px;
+            color: white;
+            padding: 7px;
+            text-align: center;
+            position: absolute;
+            top: 100px;
+            left: 850px;
+        }
+        div#goal {
+            color: white;
+            padding: 7px;
+            text-size-adjust: 30px;
+            text-align: center;
+            position: absolute;
+            top: 50px;
+            left: 800px;
+        }
+        div.cherry {
+            background: red;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
     </style>
 </head>
-
 <body>
+    <div id="rotl"></div>
+    <div id="rotu"></div>
+    <div id="rotd"></div>
+    <div id="rotr"></div>
     <div id="container">
         <div id="world"></div>
-        <div id="pacman" style="top: 0px; left: 0px;"></div>
+        <div id="pacman"></div>
+        <div id="score"></div>
+        <div id="win" class="text-success">YOU WIN</div>
+        <div id="goal">REACH 200 POINTS</div>
+        <button onClick="window.location.reload()"> Restart?</button>
     </div>
-    //list of things to do, java world(done) move pacman(done shittily)
     <script>
         var world = [
-            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2],
+            [2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+            [2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
             [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+            [2, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2]
         ];
+        var points = 0;
+        var moves = 0;
+        var score = 0;
+        var timeouts = []
+        var pacman = {
+            x: 1,
+            y: 1
+        }
+        function reload() {
+            window.location.reload()
+        }
         function displayWorld() {
             var output = '';
             for (var i = 0; i < world.length; i++) {
@@ -96,41 +150,144 @@
                         output += "<div class ='coin'></div>";
                     if (world[i][j] == 0)
                         output += "<div class ='empty'></div>";
+                    if (world[i][j] == 4)
+                        output += "<div class ='cherry'></div>";
                 }
                 output += "\n</div>";
             }
             document.getElementById('world').innerHTML = output;
         }
-        displayWorld()
-
-        var leftValue = 450, topValue = 100, direction = 'down', step = 1;
-
-        function update() {
-            document.getElementById("pacman").style.left = leftValue + "px";
-            document.getElementById("pacman").style.top = topValue + "px";
+        function displaypacman() {
+            document.getElementById("pacman").style.top = pacman.y * 20 + "px"
+            document.getElementById("pacman").style.left = pacman.x * 20 + "px"
         }
-
+        function displayscore() {
+            document.getElementById("score").innerHTML = score;
+            if (score >= 200) {
+                document.getElementById("win").style.display = 'block';
+                document.getElementById('score').style.display = 'none';
+            }
+            else {
+                document.getElementById('win').style.display = 'none';
+            }
+        }
+        function rotl() {
+            document.getElementById("pacman").style.transform = "rotate(270deg)"
+        }
+        function rotd() {
+            document.getElementById("pacman").style.transform = "rotate(180deg)"
+        }
+        function rotr() {
+            document.getElementById("pacman").style.transform = "rotate(90deg)"
+        }
+        function rotu() {
+            document.getElementById("pacman").style.transform = "rotate(0deg)"
+        }
+        function shuffle() {
+            for (var i = 0; i < world.length; i++) {
+                for (var j = 0; j < world[i].length; j++)
+                    for (let i = world.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * i)
+                        const temp = world[i]
+                        world[i] = world[j]
+                        world[j] = temp
+                    }
+            }
+        }
+        displayWorld()
+        displaypacman()
+        displayscore()
         document.onkeydown = function (e) {
-            if (e.keyCode == 65 && leftValue > 0) {
-                leftValue = leftValue - 10;
-                direction = 'left';
+            if (e.keyCode == 65) {//left
+                pacman.x--;
+                // console.log(pacman.x)
+                // console.log(pacman.y)
+                rotl()
             }
-            else if (e.keyCode == 68 && leftValue < 5000) { // RIGHT
-                leftValue = leftValue + 10;
-                direction = 'right';
+            else if (e.keyCode == 68) { // RIGHT
+                pacman.x++;
+                // console.log(pacman.x)
+                // console.log(pacman.y)
+                rotr()
             }
-            else if (e.keyCode == 83 && topValue < 5000) { // DOWN
-                topValue = topValue + 10;
-                direction = 'down';
+            else if (e.keyCode == 83) { // DOWN
+                pacman.y++;
+                // console.log(pacman.x)
+                // console.log(pacman.y)
+                rotd()
             }
-            else if (e.keyCode == 87 && topValue > 0) { //up
-                topValue = topValue - 10;
-                direction = 'top';
+            else if (e.keyCode == 87) { //up
+                pacman.y--;
+                // console.log(pacman.x)
+                // console.log(pacman.y)
+                rotu()
             }
-            // ...
-            update();
+            if (pacman.y < 0 || pacman.y >= 35 || pacman.x < 0 || pacman.x >= 18) {
+                console.log("timer started")
+                let timeout = window.setTimeout(reload, 15000)
+                timeouts.push(timeout)
+                console.log(timeouts.length)
+            }
+            if (pacman.y > 0 && pacman.y < 35 && pacman.x > 0 && pacman.x < 18) {
+                    for (let i = 0; i < timeouts.length; i++) {
+                        clearTimeout(timeouts[i])
+                        console.log("timer cleared")
+                    }
+                }
+            if (world[pacman.y][pacman.x] == 1) {
+                world[pacman.y][pacman.x] = 0;
+                points += 3;
+                moves++
+                score = points - moves
+                displayWorld();
+            }
+            if (world[pacman.y][pacman.x] == 0) {
+                world[pacman.y][pacman.x] = 0;
+                points += 0;
+                moves++
+                score = points - moves
+                displayWorld();
+                displayscore();
+            }
+            if (world[pacman.y][pacman.x] == 4) {
+                points += 20;
+                score = points - moves
+                shuffle()
+                world[pacman.y][pacman.x] = 0;
+                // ([pacman.x *(Math.random(x))],[pacman.y(Math.random(y))]) == 4
+                displayWorld();
+                displayscore();
+            }
+            if (world[pacman.y][pacman.x] == 2) {
+                if (e.keyCode == 65) {//left
+                    pacman.x++;
+                }
+                else if (e.keyCode == 68) { // RIGHT
+                    pacman.x--;
+                }
+                else if (e.keyCode == 83) { // DOWN
+                    pacman.y--;
+                }
+                else if (e.keyCode == 87) { //up
+                    pacman.y++;
+                }
+            }
+            if (world[pacman.y] === undefined || world[pacman.y] === undefined) {
+                if (e.keyCode == 65) {//left
+                    pacman.x++;
+                }
+                else if (e.keyCode == 68) { // RIGHT
+                    pacman.x--;
+                }
+                else if (e.keyCode == 83) { // DOWN
+                    pacman.y--;
+                }
+                else if (e.keyCode == 87) { //up
+                    pacman.y++;
+                }
+            }
+            displaypacman()
         }
     </script>
 </body>
-
 </html>
